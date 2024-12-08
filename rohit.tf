@@ -106,7 +106,7 @@ resource "aws_launch_template" "rohit_app_launch_template" {
   instance_type = "t2.micro"
   image_id      = "ami-0e2c8caa4b6378d8c" 
   iam_instance_profile {
-    name = aws_iam_instance_profile.rohit_app_role_profile_3.name
+    name = aws_iam_instance_profile.rohit_app_role_profile_4.name
   }
   vpc_security_group_ids = [aws_security_group.rohit_public_sg.id]
 }
@@ -245,7 +245,7 @@ resource "aws_iam_role_policy_attachment" "rohit_attach_s3_policy" {
 }
 
 # IAM Instance Profile
-resource "aws_iam_instance_profile" "rohit_app_role_profile_3" {
+resource "aws_iam_instance_profile" "rohit_app_role_profile_4" {
   name = "rohit_app-role-profile_3"
   role = aws_iam_role.rohit_app_role.name
 }

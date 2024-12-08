@@ -101,20 +101,30 @@ resource "aws_security_group" "rohit_private_sg" {
 }
 
 # Autoscaling Group
-resource "aws_launch_configuration" "rohit_app_asg_lc" {
-  name          = "rohit_asg_launch_config"
-  image_id      = "ami-0e2c8caa4b6378d8c" 
+resource "aws_launch_template" "rohit_app_launch_template" {
+  name = "rohit-app-launch-template"
+
   instance_type = "t2.micro"
-  security_groups = [aws_security_group.rohit_public_sg.id]
-  iam_instance_profile = aws_iam_instance_profile.rohit_app_role_profile_1.name
+  ami           = "ami-0e2c8caa4b6378d8c" 
+
+  vpc_security_group_ids = [aws_security_group.rohit_public_sg.id]
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.rohit_app_role_profile_3.name
+  }
 }
 
 resource "aws_autoscaling_group" "rohit_app_asg" {
-  launch_configuration = aws_launch_configuration.rohit_app_asg_lc.id
-  min_size             = 1
-  max_size             = 2
-  vpc_zone_identifier  = [aws_subnet.rohit_public_subnet_1.id, aws_subnet.rohit_public_subnet_2.id]
-  
+  launch_template {
+    id      = aws_launch_template.rohit_app_launch_template.id
+    version = "$Latest"
+  }
+
+  min_size            = 1
+  max_size            = 3
+  desired_capacity    = 1
+  vpc_zone_identifier = [aws_subnet.rohit_public_subnet_1.id, aws_subnet.rohit_public_subnet_2.id]
+
 }
 
 # Single EC2 Instance
@@ -240,8 +250,8 @@ resource "aws_iam_role_policy_attachment" "rohit_attach_s3_policy" {
 }
 
 # IAM Instance Profile
-resource "aws_iam_instance_profile" "rohit_app_role_profile_1" {
-  name = "rohit_app-role-profile_1"
+resource "aws_iam_instance_profile" "rohit_app_role_profile_3" {
+  name = "rohit_app-role-profile_3"
   role = aws_iam_role.rohit_app_role.name
 }
 

@@ -240,8 +240,8 @@ resource "aws_iam_role_policy_attachment" "rohit_attach_s3_policy" {
 }
 
 # IAM Instance Profile
-resource "aws_iam_instance_profile" "rohit_app_role_profile" {
-  name = "rohit_app-role-profile"
+resource "aws_iam_instance_profile" "rohit_app_role_profile_1" {
+  name = "rohit_app-role-profile_1"
   role = aws_iam_role.rohit_app_role.name
 }
 

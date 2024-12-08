@@ -122,7 +122,7 @@ resource "aws_instance" "rohit_private_instance" {
   ami           = "ami-0e2c8caa4b6378d8c" 
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.rohit_private_subnet.id
-  security_groups = [aws_security_group.rohit_private_sg.name]
+  vpc_security_group_ids = [aws_security_group.rohit_private_sg.name]
   tags = { Name = "rohit_private_instance" }
 }
 

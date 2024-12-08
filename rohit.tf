@@ -106,7 +106,7 @@ resource "aws_launch_configuration" "rohit_app_asg_lc" {
   image_id      = "ami-0e2c8caa4b6378d8c" 
   instance_type = "t2.micro"
   security_groups = [aws_security_group.rohit_public_sg.id]
-  iam_instance_profile = aws_iam_instance_profile.rohit_app_role_profile.name
+  iam_instance_profile = aws_iam_instance_profile.rohit_app_role_profile_1.name
 }
 
 resource "aws_autoscaling_group" "rohit_app_asg" {

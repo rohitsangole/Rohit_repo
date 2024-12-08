@@ -103,7 +103,7 @@ resource "aws_security_group" "rohit_private_sg" {
 # Autoscaling Group
 resource "aws_launch_configuration" "rohit_app_asg_lc" {
   name          = "rohit_asg_launch_config"
-  image_id      = "ami-04dd23e62ed049936" 
+  image_id      = "ami-0e2c8caa4b6378d8c" 
   instance_type = "t2.micro"
   security_groups = [aws_security_group.rohit_public_sg.id]
   iam_instance_profile = aws_iam_instance_profile.rohit_app_role_profile.name
@@ -119,7 +119,7 @@ resource "aws_autoscaling_group" "rohit_app_asg" {
 
 # Single EC2 Instance
 resource "aws_instance" "rohit_private_instance" {
-  ami           = "ami-04dd23e62ed049936" 
+  ami           = "ami-0e2c8caa4b6378d8c" 
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.rohit_private_subnet.id
   security_groups = [aws_security_group.rohit_private_sg.name]

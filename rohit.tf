@@ -99,12 +99,12 @@ resource "aws_security_group" "rohit_private_sg" {
 }
 
 # Autoscaling Group
-resource "aws_launch_template" "rohit_app_launch_template_2" {
-  name          = "rohit-app-launch-template-2"
+resource "aws_launch_template" "rohit_app_launch_template_3" {
+  name          = "rohit-app-launch-template-3"
   instance_type = "t2.micro"
   image_id      = "ami-0e2c8caa4b6378d8c" 
   iam_instance_profile {
-    name = aws_iam_instance_profile.rohit_app_role_profile_8.name
+    name = aws_iam_instance_profile.rohit_app_role_profile_9.name
   }
   vpc_security_group_ids = [aws_security_group.rohit_public_sg.id]
 }
@@ -115,7 +115,7 @@ resource "aws_autoscaling_group" "rohit_app_asg" {
   min_size             = 1
   vpc_zone_identifier  = [aws_subnet.rohit_public_subnet_1.id, aws_subnet.rohit_public_subnet_2.id]
   launch_template {
-    id      = aws_launch_template.rohit_app_launch_template_2.id
+    id      = aws_launch_template.rohit_app_launch_template_3.id
     version = "$Latest"
   }
 }
@@ -314,8 +314,8 @@ resource "aws_iam_role_policy_attachment" "rohit_attach_s3_policy" {
 }
 
 # IAM Instance Profile
-resource "aws_iam_instance_profile" "rohit_app_role_profile_8" {
-  name = "rohit_app-role-profile_8"
+resource "aws_iam_instance_profile" "rohit_app_role_profile_9" {
+  name = "rohit_app-role-profile_9"
   role = aws_iam_role.rohit_app_role.name
 }
 

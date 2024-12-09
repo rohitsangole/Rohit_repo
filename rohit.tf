@@ -99,8 +99,8 @@ resource "aws_security_group" "rohit_private_sg" {
 }
 
 # Autoscaling Group
-resource "aws_launch_template" "rohit_app_launch_template_1" {
-  name          = "rohit-app-launch-template-1"
+resource "aws_launch_template" "rohit_app_launch_template_2" {
+  name          = "rohit-app-launch-template-2"
   instance_type = "t2.micro"
   image_id      = "ami-0e2c8caa4b6378d8c" 
   iam_instance_profile {
@@ -115,7 +115,7 @@ resource "aws_autoscaling_group" "rohit_app_asg" {
   min_size             = 1
   vpc_zone_identifier  = [aws_subnet.rohit_public_subnet_1.id, aws_subnet.rohit_public_subnet_2.id]
   launch_template {
-    id      = aws_launch_template.rohit_app_launch_template.id
+    id      = aws_launch_template.rohit_app_launch_template_2.id
     version = "$Latest"
   }
 }

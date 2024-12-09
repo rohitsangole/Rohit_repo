@@ -6,9 +6,7 @@ provider "aws" {
 # VPC
 resource "aws_vpc" "rohit_app_vpc" {
   cidr_block = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  tags = { Name = "rohit_app_vpc" }
+  
 }
 
 # Subnets
@@ -17,7 +15,7 @@ resource "aws_subnet" "rohit_public_subnet_1" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  tags = { Name = "rohit_public_subnet_1" }
+  
 }
 
 resource "aws_subnet" "rohit_public_subnet_2" {
@@ -25,7 +23,7 @@ resource "aws_subnet" "rohit_public_subnet_2" {
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
-  tags = { Name = "rohit_public_subnet_2" }
+  
 }
 
 resource "aws_subnet" "rohit_private_subnet" {
@@ -33,7 +31,7 @@ resource "aws_subnet" "rohit_private_subnet" {
   cidr_block              = "10.0.3.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = false
-  tags = { Name = "rohit_private_subnet" }
+  
 }
 
 # Internet Gateway and Route Table
@@ -97,7 +95,7 @@ resource "aws_security_group" "rohit_private_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = { Name = "rohit_private_sg" }
+  
 }
 
 # Autoscaling Group
@@ -128,7 +126,7 @@ resource "aws_instance" "rohit_private_instance" {
   instance_type = "t2.micro"
   subnet_id     = aws_subnet.rohit_private_subnet.id
   vpc_security_group_ids = [aws_security_group.rohit_private_sg.id]
-  tags = { Name = "rohit_private_instance" }
+  
 }
 
 # Load Balancers
@@ -147,7 +145,78 @@ resource "aws_lb" "rohit_app_nlb" {
   subnets         = [aws_subnet.rohit_private_subnet.id]
 }
 
-# S3 Bucket
+# Target Group for Application Load Balancer
+resource "aws_lb_target_group" "rohit_alb_target_group" {
+  name        = "rohit-alb-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.rohit_app_vpc.id
+  target_type = "instance"
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+# Listener for ALB
+resource "aws_lb_listener" "rohit_alb_listener" {
+  load_balancer_arn = aws_lb.rohit_app_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rohit_alb_target_group.arn
+  }
+}
+
+# Auto Scaling Group Target Group Attachment for ALB
+resource "aws_autoscaling_attachment" "rohit_asg_alb_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.rohit_app_asg.name
+  lb_target_group_arn = aws_lb_target_group.rohit_alb_target_group.arn
+}
+
+# Target Group for Network Load Balancer
+resource "aws_lb_target_group" "rohit_nlb_target_group" {
+  name        = "rohit-nlb-tg"
+  port        = 80
+  protocol    = "TCP"
+  vpc_id      = aws_vpc.rohit_app_vpc.id
+  target_type = "instance"
+
+  health_check {
+    protocol            = "TCP"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+# Listener for NLB
+resource "aws_lb_listener" "rohit_nlb_listener" {
+  load_balancer_arn = aws_lb.rohit_app_nlb.arn
+  port              = 80
+  protocol          = "TCP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.rohit_nlb_target_group.arn
+  }
+}
+
+# NLB Target Group Attachment for Private EC2 Instance
+resource "aws_lb_target_group_attachment" "rohit_nlb_instance_attachment" {
+  target_group_arn = aws_lb_target_group.rohit_nlb_target_group.arn
+  target_id        = aws_instance.rohit_private_instance.id
+  port             = 80
+}
+
+
 # S3 Bucket
 resource "aws_s3_bucket" "rohit_app_bucket" {
   bucket = "my-rohit-app-bucket"
